@@ -2,7 +2,6 @@
 
 @section('content')
 
-
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12 col-xs-12">
@@ -46,10 +45,15 @@
                         <div class="form-group row">
                             <label for="inputLocation" class="col-sm-4 col-form-label">Employee Location</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id='locationSearch' placeholder="add location name ..">
+                                <input required type="text" class="form-control" id='locationSearch' placeholder="add location name ..">
                                 <input type="hidden" class="form-control" name="lat" id="inputLocation" placeholder="Employee Location"/>
                                 <input type="hidden" class="form-control" name="lng" id="inputLocation2" placeholder="Employee Location"/>                                
                                 <div id="map"></div>
+                                <div id="infowindow-content">
+                                    <img src="" width="16" height="16" id="place-icon">
+                                    <span id="place-name"  class="title"></span><br>
+                                    <span id="place-address"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -75,61 +79,71 @@
         var map;
         
         function initMap() {                            
-            var latitude = 31.0549151; // LATITUDE VALUE
-            var longitude = 31.380243; // LONGITUDE VALUE
-            
-            var myLatLng = {lat: latitude, lng: longitude};
-            var autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationSearch'));
+            latitude = document.getElementById('inputLocation');// LATITUDE VALUE 31.0549151; 
+            longitude = document.getElementById('inputLocation2'); // LONGITUDE VALUE 31.380243;
+            autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationSearch'));
 
             map = new google.maps.Map(document.getElementById('map'), {
-              center: myLatLng,
-              zoom: 14,
-              disableDoubleClickZoom: true, // disable the default map zoom on double click
+              center: {lat: 31.0549151, lng: 31.380243},
+              zoom: 13,
+              disableDoubleClickZoom: false, // disable the default map zoom on double click
             });
                         
             var marker = new google.maps.Marker({
-              position: myLatLng,
               map: map,
-              //title: 'Your Location',
-              draggable: true,
+              anchorPoint: new google.maps.Point(0, -29),
             });    
+
             // Bind the map's bounds (viewport) property to the autocomplete object,
             // so that the autocomplete requests use the current map bounds for the
             // bounds option in the request.
-            //autocomplete.bindTo('bounds', map);
+            autocomplete.bindTo('bounds', map);
+            infowindow = new google.maps.InfoWindow();
+            infowindowContent = document.getElementById('infowindow-content');
+            infowindow.setContent(infowindowContent);
 
-            var searchBox = google.maps.places.SearchBox(document.getElementById('locationSearch'));
-            google.maps.event.addListener(searchBox,'place_changed', function(){
-                var places = searchBox.getPlaces();
-                var bounds = new google.maps.LatLngBounds();
-                var i, place;
-
-                for(i=0; place=place[i]; i++){
-                    bounds.extend(place.geometry.location);
-                    marker.setPosition(place.geometry.location); //set marker to the new position ...
+            autocomplete.addListener('place_changed', function(event) {
+                infowindow.close();
+                marker.setVisible(false);
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    // User entered the name of a Place that was not suggested and
+                    // pressed the Enter key, or the Place Details request failed.
+                    window.alert("No details available for input: '" + place.name + "'");
+                    return;
                 }
 
-                map.fitBounds(bounds);
-                map.setZoom(14);
+                // If the place has a geometry, then present it on a map.
+                if (place.geometry.viewport) {
+                    map.fitBounds(place.geometry.viewport);
+                } else {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17);  // Why 17? Because it looks good.
+                }
+                marker.setPosition(place.geometry.location);
+                marker.setVisible(true);
 
+                var address = '';
+                if (place.address_components) {
+                    address = [
+                    (place.address_components[0] && place.address_components[0].short_name || ''),
+                    (place.address_components[1] && place.address_components[1].short_name || ''),
+                    (place.address_components[2] && place.address_components[2].short_name || '')
+                    ].join(' ');
+                }
+
+                infowindowContent.children['place-icon'].src = place.icon;
+                infowindowContent.children['place-name'].textContent = place.name;
+                infowindowContent.children['place-address'].textContent = address;
+                infowindow.open(map, marker);
+                latitude.value = place.geometry.location.lat();
+                longitude.value = place.geometry.location.lng();
             });
-
-            google.maps.event.addListener(searchBox,'places_changed', function(event){
-                var lat = marker.getPosition().lat();
-                var lng = marker.getPosition().lng();
-
-                document.getElementById('inputLocation').value = lat;
-                document.getElementById('inputLocation2').value =  lng;                                
-            });
-
-            // Update lat/long value of div when the marker is clicked
-            /*marker.addListener('click', function(event) {              
-                document.getElementById('inputLocation').value = event.latLng.lat();
-                document.getElementById('inputLocation2').value =  event.latLng.lng();
-            });*/
         }
+
         </script>
 
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADDonI8QXXG340ZQW_wNhG2xZMG6O3BcY&libraries=places&callback=initMap"
 async defer></script>
+
 @endsection

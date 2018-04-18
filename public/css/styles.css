@@ -43,3 +43,13 @@
     height: 220px;
     border: 1px solid #9b9b9b;
 }
+#infowindow-content {
+    display: none;
+}
+
+#map #infowindow-content {
+    display: inline;
+}
+#infowindow-content .title {
+    font-weight: bold;
+}

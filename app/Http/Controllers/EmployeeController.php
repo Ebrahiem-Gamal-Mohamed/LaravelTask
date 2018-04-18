@@ -19,7 +19,6 @@ class EmployeeController extends Controller
     {
         //$employees = Employee::paginate();
         $employees = Employee::all();
-        
         return view('home',compact('employees'));
     }
     /**
@@ -43,7 +42,7 @@ class EmployeeController extends Controller
     {
         $imageName="";
         if($request->hasFile('user_image')){
-            $imageName=$request->image->store('public');
+            $imageName=$request->user_image->store('public');
         }
 
         //Make Validation ...
@@ -59,11 +58,11 @@ class EmployeeController extends Controller
         $employee->user_image = $imageName;  
         $employee->job = request('emp_job');  
         $employee->user_id = request('user_id');  
-        $employee->location = (request('lat').','.request('lng'));  
+        $employee->location = \DB::raw("GeomFromText('POINT(".request('lat')." ".request('lng').")')");  
         $employee->save(); 
 
         $employees = Employee::all();
-        return view('home',compact('employees'));
+        return redirect('home');
     }
 
     /**
@@ -74,8 +73,8 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        $emp = Employee::with('user_id')->find($id);
-        return $emp;
+        $emp = Employee::find($id);
+        return $emp; //json_encode($emp);
     }
 
     /**
@@ -86,7 +85,7 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::with('user_id')->find($id);
+        $employee = Employee::find($id)->user_emp;
         return view('employee.edit',compact('employee'));
     }
 
@@ -101,9 +100,9 @@ class EmployeeController extends Controller
     {
         $imageName="";
         if($request->hasFile('user_image')){
-            $imageName=$request->image->store('public');
+            $imageName=$request->user_image->store('public');
         }
-
+        $employee = Employee::find($id)->user_emp;
         //Make Validation ...
         $this->validate($request,[
             "first_name"=>'required|string|min:3|max:15',
@@ -111,15 +110,14 @@ class EmployeeController extends Controller
             "user_image"=>['required','image','dimensions:min_width=100,min_height=200']
           ]);
 
-        $employee = new Employee;
         $employee->first_name = request('first_name');
         $employee->last_name = request('last_name');
         $employee->user_image = $imageName;  
         $employee->job = request('emp_job');  
         $employee->user_id = request('user_id');  
-        $employee->location = (request('lat').','.request('lng'));
+        $employee->location = \DB::raw("GeomFromText('POINT(".request('lat')." ".request('lng').")')");  
         $employee->save(); 
-
+        
         $employees = Employee::all();
         return view('home',compact('employees'));
     }
@@ -139,14 +137,14 @@ class EmployeeController extends Controller
     public function search(){
         $employee  = Employee::all();
         //$page = Input::get('page', 1); 
-
+        $user_detail = [];
         $keyword = request('search_item');
 
         if ($keyword!='') {
-            $employee  = Employee::with('user_id')
-                   ->where("first_name", "LIKE","%$keyword%")
+            $employee  = Employee::
+                   where("first_name", "LIKE","%$keyword%")
                    ->orWhere("last_name", "LIKE", "%$keyword%")
-                   ->get();           
+                   ->get();
         }
 
        return $employee;
