@@ -1,0 +1,45 @@
+.card-body h2{
+    margin: 20px 0 40px;
+}
+
+.add-on .input-group-btn > .btn {
+    border: 1px solid #ced4da;
+    border-left-width:0;left:-2px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    border-radius: 0;
+}
+
+/* When the input field gets focus, change its width to 100% */
+.add-on .form-control:focus {
+    box-shadow:none;
+    -webkit-box-shadow:none; 
+    border-color:#cccccc; 
+}
+
+.navbar-nav:last-child{ border-right:0}
+
+.card-body table{
+    margin-top: 40px;
+}
+.card-body table th{
+    text-align: center;
+}
+
+.custom_form{
+    width: 600px;
+    margin: auto;
+    padding: 20px;
+    background: #eee;
+    border: 1px solid #ddd;
+    margin-bottom: 40px;
+}
+.custom_form textarea{
+    max-height: 150px;
+}
+
+#map{
+    margin: 20px 0;
+    height: 220px;
+    border: 1px solid #9b9b9b;
+}
