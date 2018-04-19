@@ -19,7 +19,13 @@ class EmployeeController extends Controller
     {
         //$employees = Employee::paginate();
         $employees = Employee::all();
-        return view('home',compact('employees'));
+
+        $mylocation = Employee::first()->location;
+        $mylocation = explode('(',$mylocation);
+        $mylocation = explode(')',$mylocation[1]);
+        $mylocation = explode(' ',$mylocation[0]);
+
+        return view('home', ['employees'=>$employees, 'location'=>$mylocation]);
     }
     /**
      * Show the form for creating a new resource.
@@ -73,7 +79,8 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        $emp = Employee::find($id);
+        //$emp = Employee::find($id)->user_emp;
+        $emp = Employee::find($id);       
         return $emp; //json_encode($emp);
     }
 
@@ -85,8 +92,14 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        $employee = Employee::find($id)->user_emp;
-        return view('employee.edit',compact('employee'));
+        $employee = Employee::find($id);
+        //$mylocation = \DB::table('employees')->select((\DB::raw('AsText(location)')))->where('id',$id)->get();
+        $mylocation = Employee::first()->location;
+        $mylocation = explode('(',$mylocation);
+        $mylocation = explode(')',$mylocation[1]);
+        $mylocation = explode(' ',$mylocation[0]);
+
+        return view('employee.edit',['employee'=>$employee, 'location'=>$mylocation]);
     }
 
     /**
@@ -102,7 +115,7 @@ class EmployeeController extends Controller
         if($request->hasFile('user_image')){
             $imageName=$request->user_image->store('public');
         }
-        $employee = Employee::find($id)->user_emp;
+        $employee = Employee::find($id);
         //Make Validation ...
         $this->validate($request,[
             "first_name"=>'required|string|min:3|max:15',

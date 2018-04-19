@@ -22,7 +22,7 @@ Route::get('employee/add','EmployeeController@create');
 Route::post('employee/store','EmployeeController@store');
 
 Route::get('employee/edit/{id}', 'EmployeeController@edit');
-Route::get('employee/update/{id}','EmployeeController@update');
+Route::post('employee/{id}/update','EmployeeController@update');
 
 Route::get('employee/search', 'EmployeeController@search');
 Route::get('employee/show/{id}', 'EmployeeController@show');
