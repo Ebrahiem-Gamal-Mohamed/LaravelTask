@@ -19,8 +19,9 @@ class EmployeeController extends Controller
     {
         //$employees = Employee::paginate();
         $employees = Employee::all();
-
-        $mylocation = Employee::first()->location;
+        
+        $mylocation = $employees->first()->location;
+        //return $mylocation;
         $mylocation = explode('(',$mylocation);
         $mylocation = explode(')',$mylocation[1]);
         $mylocation = explode(' ',$mylocation[0]);
@@ -67,7 +68,6 @@ class EmployeeController extends Controller
         $employee->location = \DB::raw("GeomFromText('POINT(".request('lat')." ".request('lng').")')");  
         $employee->save(); 
 
-        $employees = Employee::all();
         return redirect('home');
     }
 
@@ -94,7 +94,7 @@ class EmployeeController extends Controller
     {
         $employee = Employee::find($id);
         //$mylocation = \DB::table('employees')->select((\DB::raw('AsText(location)')))->where('id',$id)->get();
-        $mylocation = Employee::first()->location;
+        $mylocation = $employee->location;
         $mylocation = explode('(',$mylocation);
         $mylocation = explode(')',$mylocation[1]);
         $mylocation = explode(' ',$mylocation[0]);
@@ -111,28 +111,23 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $imageName="";
-        if($request->hasFile('user_image')){
-            $imageName=$request->user_image->store('public');
-        }
         $employee = Employee::find($id);
+
         //Make Validation ...
         $this->validate($request,[
             "first_name"=>'required|string|min:3|max:15',
             "last_name"=>'required|string|min:3|max:15',
-            "user_image"=>['required','image','dimensions:min_width=100,min_height=200']
+            "emp_job"=>'required|string|min:10',
           ]);
 
         $employee->first_name = request('first_name');
         $employee->last_name = request('last_name');
-        $employee->user_image = $imageName;  
         $employee->job = request('emp_job');  
-        $employee->user_id = request('user_id');  
+        $employee->user_id = $id;  
         $employee->location = \DB::raw("GeomFromText('POINT(".request('lat')." ".request('lng').")')");  
         $employee->save(); 
         
-        $employees = Employee::all();
-        return view('home',compact('employees'));
+        return redirect('home');
     }
 
     /**

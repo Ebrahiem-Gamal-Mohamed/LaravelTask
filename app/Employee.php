@@ -10,7 +10,7 @@ class Employee extends Model
 {
     use Notifiable;
 
-    protected $hidden = ['location',];
+    //protected $hidden = ['location',];
 
     /**
      * The attributes that are mass assignable.

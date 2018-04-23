@@ -10,20 +10,33 @@
                     <h2 class="h2 text-center">Edit <strong>{{ $employee->first_name }} {{ $employee->last_name }}</strong> Data</h2>
                     <form class="custom_form" method="POST" action="/employee/{{ $employee->id }}/update" enctype="multipart/form-data" >
                         @csrf
+                        @if ($errors->has('first_name'))
+                            <span class="invalid-feedback">
+                                <strong>{{ $errors->first('first_name') }}</strong>
+                            </span>
+                        @endif
                         <div class="form-group row">
                             <label for="inputFirstName" class="col-sm-4 col-form-label">First Name</label>
                             <div class="col-sm-8">
                                 <input value="{{ $employee->first_name }}" name="first_name" type="text" class="form-control" id="inputFirstName" placeholder="First Name" required>
                             </div>
                         </div>
-
+                        @if ($errors->has('last_name'))
+                            <span class="invalid-feedback">
+                                <strong>{{ $errors->first('last_name') }}</strong>
+                            </span>
+                        @endif
                         <div class="form-group row">
                             <label for="inputLastName" class="col-sm-4 col-form-label">Last Name</label>
                             <div class="col-sm-8">
                                 <input value="{{ $employee->last_name }}" name="last_name" type="text" class="form-control" id="inputLastName" placeholder="Last Name" required>
                             </div>
                         </div>
-
+                        @if ($errors->has('emp_job'))
+                            <span class="invalid-feedback">
+                                <strong>{{ $errors->first('emp_job') }}</strong>
+                            </span>
+                        @endif
                         <div class="form-group row">
                             <label for="inputJob" class="col-sm-4 col-form-label">Employee Job</label>
                             <div class="col-sm-8">
@@ -42,16 +55,6 @@
                                     <img src="" width="16" height="16" id="place-icon">
                                     <span id="place-name"  class="title"></span><br>
                                     <span id="place-address"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-sm-4 col-form-label" for="exampleFormControlFile1">Upload new image</label>
-                            <div class="col-sm-8">
-                                <input name="user_image" value="{{ $employee->user_image }}" type="file" class="form-control-file" id="exampleFormControlFile1">
-                                <div>
-                                    <img style="width:80%;height:120px;margin:20px 0;" src=" {{Storage::url($employee->user_image) }}" alt="old user image ">
                                 </div>
                             </div>
                         </div>
